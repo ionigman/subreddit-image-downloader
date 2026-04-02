@@ -30,7 +30,7 @@ while true; do
         title=$(echo -n "$titles"|sed -n "${a}p")
         id=$(echo -n "$ids"|sed -n "${a}p")
         newname=$(echo $title | tr -d '/\r\n' | sed 's/\// /g')_"$subreddit"_$id.$(echo -n "${url##*.}"|cut -d '?' -f 1 | sed 's/gif/png/')
-        echo "spawning process to grab image $i/$limit: $newname with id $id from url $url"
+        echo "spawning process to grab image $i/$limit: $newname."
         curl -A$ua --output "$subreddit/$newname" $url  &>/dev/null &
         ((a++))
         ((i++))
