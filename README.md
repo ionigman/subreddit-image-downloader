@@ -14,7 +14,8 @@ Requirements
 - bash (cygwin is OK)
 - curl
 - jq
-
+- set environment variable with your reddit username at REDDIT_USERNAME
+  
 Usage
 =====
 ```
