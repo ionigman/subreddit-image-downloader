@@ -15,7 +15,9 @@ fi
 
 base_url="https://www.reddit.com/r/$subreddit/$sort/.json?raw_json=1"
 url="${base_url}&t=$top_time"
-content=`curl $url`
+ua="linux-any-bash:imglora-grabber:0.1b(by:/u/$REDDIT_USERNAME)"
+
+content=`curl -sA$ua $url`
 mkdir -p $subreddit
 i=1
 while true; do
@@ -28,19 +30,20 @@ while true; do
         title=$(echo -n "$titles"|sed -n "${a}p")
         id=$(echo -n "$ids"|sed -n "${a}p")
         newname=$(echo $title | tr -d '/\r\n' | sed 's/\// /g')_"$subreddit"_$id.$(echo -n "${url##*.}"|cut -d '?' -f 1 | sed 's/gif/png/')
-        echo "$i/$limit : $newname"
-        curl --retry 3 --no-clobber --output "$subreddit/$newname" $url &>/dev/null &
+        echo "spawning process to grab image $i/$limit: $newname with id $id from url $url"
+        curl -A$ua --output "$subreddit/$newname" $url  &>/dev/null &
         ((a++))
         ((i++))
         if (( i > limit )); then
-          wait
+          echo "limit of $limit reached, complete."
           exit 0
         fi
     done
     after=$(echo -n "$content"| jq -r '.data.after//empty')
     if [ -z $after ]; then
+	echo "ran out of content, complete."
         break
     fi
-    url="${base_url}&count=200&after=$after&t=$top_time"
-    content=`curl --retry 3 $url`
+    url="${base_url}&count=50&after=$after&t=$top_time"
+    content=`curl -sA$ua $url`
 done
